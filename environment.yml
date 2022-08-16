@@ -1,0 +1,26 @@
+name: thisted_speech
+dependencies:
+- python=3.8
+- anaconda  # seems this is required to run with jupyter
+- pip
+- pyaudio
+- pip:
+  # works for regular pip packages
+  - requests
+  - six
+  - starlette
+  - pydantic
+  - playsound
+  - loguru
+  - numpy
+  - plotly
+  - pytest
+  - pandas
+  - uvicorn
+  - pyarrow
+  - matplotlib
+  - fastapi
+  - protobuf
+  - google-cloud-speech
+  - uvicorn
+

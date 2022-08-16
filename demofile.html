@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Thisted App</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+		<script>
+		    $(document).ready(function(){
+		        $("#welcomeScreen").modal('show');
+		    });
+		</script>
+    </head>
+
+   <body>
+
+   <!-- Navbars -->
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #314b6d;">
+            <div class="container-fluid">
+            <div class="input-group text-white">
+              <p class="fs-2">Bruger -</p> &nbsp; <span id="nameOfUser" class="fs-2"></span>
+            </div>
+            </div>
+          </nav>
+           <nav class="navbar navbar-light" style="background-color: #82b7b8;">
+               <div class="container-fluid">
+            <div class="input-group text-white">
+              <p class="fs-2">CURA AI</p>
+                            </div>
+            </div>
+          </nav>
+
+        <!-- Modals -->
+		<div class="modal fade" id="welcomeScreen" tabindex="-1" role="dialog" aria-labelledby="submit" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header text-white" style="background-color: #314b6d;">
+                  <h5 class="modal-title" id="exampleModalCenterTitle">Thisted Demo</h5>
+                </div>
+                  &nbsp;
+
+                <div class="modal-body" style="text-align: center">
+                    <h3>Venligst indtast dit navn:</h3>
+                    <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" id="userInput">
+                </div>
+
+                  &nbsp;
+                <div class="modal-footer text-white" style="background-color: #82b7b8;">
+                  <button type="button" class="btn btn-primary btn-lg btn-block" data-dismiss="modal" data-toggle="modal" onclick="submitName()">Start App</button>
+                </div>
+              </div>
+            </div>
+        </div>
+
+&nbsp;
+
+   <div class="row">
+          <div class="col-9">
+              <div class="container-fluid">
+         <div class="mb-3">
+           <label for="exampleFormControlTextarea1" class="form-label">CURA Speech Recognition</label>
+           <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+          </div>
+        </div>
+        
+        <!--Clear text button-->
+        <div class="container-fluid"> &nbsp;&nbsp;&nbsp;&nbsp;
+          <button type="button" class="btn btn-primary btn-lg" onclick="clear_text()">Clear text</button>
+        </div>
+      
+      </div>
+
+          <!--Recording-->
+             <div class="col-3 my-auto">
+                 <div class="container-fluid">
+                   <h5>Recording</h5>
+                   <button type="button" class="btn btn-light btn-lg" onclick="start_speech()"><img src="https://drive.google.com/uc?id=1frmsTUNL-8jy4CTZ6TPmbzefAu6x-ocj" width="15" height="22"></button>
+                   <button type="button" class="btn btn-light btn-lg" onclick="stop_speech()"><img src="https://drive.google.com/uc?id=14m2SuZtE1zStij8s2ZkAuXWuhQbpciXB" width="20" height="20"></button>
+                   <div class="btn-group" role="group" aria-label="..."></div>
+                  </div>
+          <br>
+          <!--Reading-->
+              <div class="col-3 my-auto">
+              <div class="container-fluid">
+                <h5>Reading</h5>
+                <div class="btn-group" role="group" >
+                <button type="button" class="btn btn-light btn-lg" onclick="read_text()"><img src="https://drive.google.com/uc?id=1OPjqqLnHAN5-T00-vDdp6YdhNTPbKxhS" width="20" height="20"></button>
+                <!--Dropdown bar-->
+                <div class="dropdown">
+                    <select class="btn btn-light btn-lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                      <span class="caret"></span>
+                      <!--option value="">Hastighed</option-->
+                      <option style="font-size:16px;">Hastighed: 0.5</option>
+                      <option style="font-size:16px;" selected>Hastighed: 1.0</option>
+                      <option style="font-size:16px;">Hastighed: 1.5</option>
+                      <option style="font-size:16px;">Hastighed: 2.0</option>
+                  </div>
+                </div>
+              </div>
+            </div>            
+   </div>
+  </div>
+   </body>
+   <script>
+
+
+var is_running = false;
+var userName = "";
+var textValue = "";
+
+function start_speech() {
+  var form = document.getElementById("exampleFormControlTextarea1");
+  textValue = form.value + " ";
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "totext/start", async=true);
+  is_running = true;
+  xhttp.onload  = function() {
+   if (!is_running) { return; }
+   next_speech();
+  }
+  xhttp.send();
+};
+
+function stop_speech() {
+  var xhttp = new XMLHttpRequest();
+  var postURL = "totext/stop?user_name=" + userName;
+  form = document.getElementById("exampleFormControlTextarea1");
+
+  xhttp.open("POST", postURL, async=true);
+  is_running = false;
+  xhttp.onload  = function() {
+   is_running = false;
+  }
+  xhttp.send();
+};
+
+function next_speech() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "totext/next", async=true);
+  xhttp.onload  = function() {
+   if (!is_running) { return; }
+   var jsonResponse = JSON.parse(xhttp.responseText);
+   form = document.getElementById("exampleFormControlTextarea1");
+   if (jsonResponse["transcript"]!="") {
+     form.value = textValue + jsonResponse["transcript"];
+   }
+   if (is_running) { next_speech();
+   }
+  };
+  xhttp.send();
+};
+
+function read_text() {
+  var form = document.getElementById("exampleFormControlTextarea1");
+  var speechRate = document.getElementById("dropdownMenu1").value;
+  console.log(speechRate);
+  if (speechRate === "Hastighed: 0.5") {
+    var speech_rate = "0.65"
+  } else if (speechRate === "Hastighed: 1.0") {
+    var speech_rate = "0.85"
+  } else if (speechRate === "Hastighed: 1.5") {
+    var speech_rate = "1.1"
+  } else {
+    var speech_rate = "1.45"
+  }
+  var postURL = "tospeech/read?input_string=" + form.value + "&speech_rate=" + speech_rate;
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", postURL, async=true);
+  xhttp.send();
+};
+
+function clear_text() {
+  var form = document.getElementById("exampleFormControlTextarea1");
+  form.value = "";
+};
+
+   //Session functions
+    function submitName() {
+        userName = document.getElementById("userInput").value;
+        var z = document.createElement('p');
+        z.innerHTML = userName;
+        document.getElementById("nameOfUser").appendChild(z);
+    }
+   </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+   </body>
+</html>
